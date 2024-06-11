@@ -1,11 +1,11 @@
 from settings import *
 from sprites import *
 class Player(pygame.sprite.Sprite):
-    def __init__(self, pos, groups, collision_sprites):
+    def __init__(self, pos, frames, groups, collision_sprites):
         super().__init__(groups)
 
         self.groups = groups
-        self.load_images()
+        self.frames = frames
         self.state, self.frame_index = 'idle', 0
 
 
@@ -89,12 +89,13 @@ class Player(pygame.sprite.Sprite):
 
         if pygame.mouse.get_pressed()[0] == 1:
             self.laser.toggle = True
+            self.abduction.toggle = False
         else:
             self.laser.toggle = False
 
         if pygame.mouse.get_pressed()[2] == 1:
             self.abduction.toggle = True
-
+            self.laser.toggle = False
         else:
             self.abduction.toggle = False
     def animate(self, dt):
@@ -117,7 +118,7 @@ class Player(pygame.sprite.Sprite):
 
 
         #animation
-        self.frame_index += 60 * dt
+        self.frame_index += dt * 60
         self.image = self.frames[self.state][int(self.frame_index) % len(self.frames[self.state])]
 
     def update(self, dt):
