@@ -12,9 +12,6 @@ class AllSprites(pygame.sprite.Group):
         self.camera = Vector2(WINDOW_WIDTH/2, WINDOW_HEIGHT / 2)
 
     def draw(self, target_pos):
-
-
-
         heading = target_pos - self.camera
         self.camera += heading * 0.01
         self.offset = -self.camera + Vector2(WINDOW_WIDTH/2, WINDOW_HEIGHT/2)
@@ -22,8 +19,9 @@ class AllSprites(pygame.sprite.Group):
 
 
         ground_sprites = [sprite for sprite in self if hasattr(sprite, 'ground')]
-        object_sprites = [sprite for sprite in self if not hasattr(sprite, 'ground')]
+        shadow_sprites = [sprite for sprite in self if hasattr(sprite, 'shadow')]
+        object_sprites = [sprite for sprite in self if not hasattr(sprite, 'ground') and not hasattr(sprite, 'shadow')]
 
-        for layer in [ground_sprites, object_sprites]:
+        for layer in [ground_sprites,shadow_sprites,  object_sprites]:
             for sprite in sorted(layer, key = lambda sprite: sprite.rect.centery):
                 self.display_surface.blit(sprite.image, sprite.rect.topleft + self.offset)
