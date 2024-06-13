@@ -50,31 +50,31 @@ class Player(pygame.sprite.Sprite):
     #                     surf = pygame.image.load(full_path).convert_alpha()
     #                     self.frames[state].append(surf)
     def input(self, dt):
+        if dt !=0:
+            keys = pygame.key.get_pressed()
+            input_left = keys[pygame.K_LEFT] or keys[pygame.K_a]
+            input_right = keys[pygame.K_RIGHT] or keys[pygame.K_d]
+            input_up = keys[pygame.K_UP] or keys[pygame.K_w]
+            input_down = keys[pygame.K_DOWN] or keys[pygame.K_s]
 
-        keys = pygame.key.get_pressed()
-        input_left = keys[pygame.K_LEFT] or keys[pygame.K_a]
-        input_right = keys[pygame.K_RIGHT] or keys[pygame.K_d]
-        input_up = keys[pygame.K_UP] or keys[pygame.K_w]
-        input_down = keys[pygame.K_DOWN] or keys[pygame.K_s]
-        self.fire = keys[pygame.K_SPACE]
-        if int(input_left) == 0 and int(input_right) == 0:
-            self.direction.x = self.direction.x * self.dumping
-            if abs(self.direction.x) < 0.01:
-                self.direction.x = int(0)
-        else:
-            self.direction.x = int(input_right) - int(input_left)
+            if int(input_left) == 0 and int(input_right) == 0:
+                self.direction.x = self.direction.x * self.dumping
+                if abs(self.direction.x) < 0.01:
+                    self.direction.x = int(0)
+            else:
+                self.direction.x = int(input_right) - int(input_left)
 
-        if int(input_up) == 0 and int(input_down) == 0:
-            self.direction.y = self.direction.y * self.dumping
-            if abs(self.direction.y) < 0.01:
-                self.direction.y = int(0)
-        else:
-            self.direction.y = int(input_down) - int(input_up)
+            if int(input_up) == 0 and int(input_down) == 0:
+                self.direction.y = self.direction.y * self.dumping
+                if abs(self.direction.y) < 0.01:
+                    self.direction.y = int(0)
+            else:
+                self.direction.y = int(input_down) - int(input_up)
 
-        self.direction = self.direction.normalize() if (abs(self.direction.x) >= 1 or abs(self.direction.y) >= 1) else self.direction
+            self.direction = self.direction.normalize() if (abs(self.direction.x) >= 1 or abs(self.direction.y) >= 1) else self.direction
 
 
-        #print(self.direction)
+            #print(self.direction)
     def move(self, dt):
 
         self.hitbox_rect.x += self.speed * self.direction.x * dt
@@ -94,19 +94,19 @@ class Player(pygame.sprite.Sprite):
                 if direction == 'vertical':
                     if self.direction.y > 0: self.hitbox_rect.bottom = sprite.rect.top
                     if self.direction.y < 0: self.hitbox_rect.top = sprite.rect.bottom
-    def shoot(self):
+    def shoot(self, dt):
+        if dt != 0:
+            if pygame.mouse.get_pressed()[0] == 1:
+                self.laser.toggle = True
+                self.abduction.toggle = False
+            else:
+                self.laser.toggle = False
 
-        if pygame.mouse.get_pressed()[0] == 1:
-            self.laser.toggle = True
-            self.abduction.toggle = False
-        else:
-            self.laser.toggle = False
-
-        if pygame.mouse.get_pressed()[2] == 1:
-            self.abduction.toggle = True
-            self.laser.toggle = False
-        else:
-            self.abduction.toggle = False
+            if pygame.mouse.get_pressed()[2] == 1:
+                self.abduction.toggle = True
+                self.laser.toggle = False
+            else:
+                self.abduction.toggle = False
     def animate(self, dt):
         #get state
         if self.direction.x == 0 and self.direction.y == 0:
@@ -133,7 +133,7 @@ class Player(pygame.sprite.Sprite):
 
     def update(self, dt):
 
-        self.shoot()
+        self.shoot(dt)
         self.input(dt)
         self.move(dt)
         self.animate(dt)

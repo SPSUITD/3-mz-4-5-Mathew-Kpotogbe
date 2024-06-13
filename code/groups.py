@@ -1,6 +1,5 @@
 import pygame
 from pygame import Vector2
-
 from settings import *
 
 class AllSprites(pygame.sprite.Group):
@@ -11,10 +10,11 @@ class AllSprites(pygame.sprite.Group):
 
         self.camera = Vector2(WINDOW_WIDTH/2, WINDOW_HEIGHT / 2)
 
-    def draw(self, target_pos):
-        heading = target_pos - self.camera
-        self.camera += heading * 0.01
-        self.offset = -self.camera + Vector2(WINDOW_WIDTH/2, WINDOW_HEIGHT/2)
+    def draw(self, target_pos, dt):
+        if dt != 0:
+            heading = target_pos - self.camera
+            self.camera += heading * 0.01
+            self.offset = -self.camera + Vector2(WINDOW_WIDTH/2, WINDOW_HEIGHT/2)
 
 
 
