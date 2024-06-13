@@ -1,6 +1,6 @@
 import pygame
 from pygame import Surface
-
+from timer import Timer
 from settings import *
 from math import floor, ceil
 class Npc(pygame.sprite.Sprite):
@@ -11,12 +11,15 @@ class Npc(pygame.sprite.Sprite):
         self.abduction_state = abduction_state
         self.image = pygame.image.load(join('..', 'images', 'npc', 'down', '0001.png')).convert_alpha()
 
+        self.abduction_timer = Timer(800)
+
         self.alive = True
         self.collision_sprites = collision_sprites
         self.direction = pygame.Vector2()
         self.player = player
         self.frames = frames
         self.frame_index = 0
+
 
         self.rect = self.image.get_frect(center = (pos))
         self.hitbox_rect = self.rect.inflate(-50,-30)
@@ -81,6 +84,11 @@ class Npc(pygame.sprite.Sprite):
             self.image = (self.frames[self.state][int(self.frame_index) % len(self.frames[self.state])]).convert_alpha()
         else:
             self.image = pygame.transform.scale_by(self.image,(0.9999,0.9999))
+            #print(self.abduction_timer.ticks)
+            if not self.abduction_timer.active:
+                self.kill()
+
+
             #self.image = (self.frames[self.state][int(self.frame_index) % len(self.frames[self.state])])
         #self.image = pygame.Surface(self.hitbox_rect.size).convert_alpha()
 
@@ -90,8 +98,11 @@ class Npc(pygame.sprite.Sprite):
 
         if playerOnTop and self.abduction_state.toggle:
             self.alive = False
+            self.abduction_timer.activate()
+
 
     def update(self, dt):
+        self.abduction_timer.update()
 
         self.get_direction()
         self.abduction(self.player_shadow)

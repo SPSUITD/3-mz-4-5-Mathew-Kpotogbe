@@ -2,7 +2,7 @@ from pygame import Surface
 
 from settings import *
 from sprites import *
-
+from timer import Timer
 
 
 
@@ -36,6 +36,8 @@ class Player(pygame.sprite.Sprite):
         self.direction = pygame.Vector2()
         self.speed = 500
         self.collision_sprites = collision_sprites
+
+
 
     # def load_images(self):
     #     self.frames = {'idle':[],'left':[],'right':[],'up':[],'down':[],'down_left':[],'down_right':[],'up_left':[],'up_right':[]}
@@ -134,9 +136,7 @@ class Player(pygame.sprite.Sprite):
         self.shoot()
         self.input(dt)
         self.move(dt)
-
         self.animate(dt)
-
 
 
 
@@ -216,5 +216,5 @@ class Shadow(pygame.sprite.Sprite):
         #self.image = Surface((self.hitbox.size)).convert_alpha()
         #отладка тени
 
-200
+
 

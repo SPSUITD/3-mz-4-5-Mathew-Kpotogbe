@@ -22,12 +22,12 @@ class Game:
         self.all_sprites = AllSprites()
         self.collision_sprites = pygame.sprite.Group()
         self.tool_sprites = pygame.sprite.Group()
-        self.enemy_sprites = pygame.sprite.Group()
+        self.npc_sprites = pygame.sprite.Group()
 
         #npc timer
         self.npc_spawn_limit = 20
         self.npc_event = pygame.event.custom_type()
-        self.npc_spaw_rate = 500
+        self.npc_spaw_rate = 50
         pygame.time.set_timer(self.npc_event, self.npc_spaw_rate)
         self.spawn_positions = []
 
@@ -35,6 +35,12 @@ class Game:
 
         #load images
         self.npc_frames = load_images('npc')
+
+        #game timer
+        self.energy = Timer(10000)
+        self.energy.activate()
+
+
 
 
     def setup(self):
@@ -65,17 +71,19 @@ class Game:
 
             # eventloop
             for event in pygame.event.get():
-                if (event.type == self.npc_event) and (len(self.enemy_sprites)) < self.npc_spawn_limit:
+                if (event.type == self.npc_event) and (len(self.npc_sprites)) < self.npc_spawn_limit:
                     Npc(choice(self.spawn_positions), self.npc_frames, self.player,self.player_shadow,
-                        self.player.abduction,(self.all_sprites, self.enemy_sprites), self.collision_sprites)
-
+                        self.player.abduction,(self.all_sprites, self.npc_sprites), self.collision_sprites)
+                    print(self.npc_sprites)
                 if event.type == pygame.QUIT:
                     self.running = False
             # update
             self.all_sprites.update(dt)
+            self.energy.update()
+            print(self.energy.ticks)
             # draw
             self.all_sprites.draw(self.player.rect.center)
-            #print(self.clock.get_fps())
+            #dprint(self.clock.get_fps())
             pygame.display.update()
         pygame.quit()
 if __name__ == '__main__':
