@@ -36,7 +36,7 @@ class Player(pygame.sprite.Sprite):
         #movement
         self.dumping = 0
         self.direction = pygame.Vector2()
-        self.speed = 500
+        self.speed = 600
         self.collision_sprites = collision_sprites
 
 
@@ -141,6 +141,7 @@ class Player(pygame.sprite.Sprite):
             self.frame_index += dt * 60
             self.image = self.frames[self.state][int(self.frame_index) % len(self.frames[self.state])]
         else:
+            #fallAnimation
             self.state = 'fall'
             if self.fall_animation_index < 59:
                 self.fall_animation_index += dt * 60

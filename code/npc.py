@@ -1,45 +1,67 @@
 import pygame
-from pygame import Surface
+from pygame import Surface, Vector2
 from timer import Timer
 from settings import *
 from math import floor, ceil
 
 
 class Npc(pygame.sprite.Sprite):
-    def __init__(self, pos,frames, player, player_shadow,abduction_state, groups, collision_sprites, callback = None):
+    def __init__(self, pos,frames, player, player_shadow,abduction_state, groups, collision_sprites, level, callback = None):
         super().__init__(groups)
-        #impoerted values
+        # imported values
         self.player_shadow = player_shadow
+        self.player = player
+
         self.abduction_state = abduction_state
         self.image = pygame.image.load(join('..', 'images', 'npc', 'down', '0001.png')).convert_alpha()
 
         self.abduction_timer = Timer(800)
 
+        self.level = level
         self.alive = True
         self.collision_sprites = collision_sprites
         self.direction = pygame.Vector2()
-        self.player = player
+
+
         self.frames = frames
         self.frame_index = 0
-
-
+        self.ufo_in_view = False
         self.rect = self.image.get_frect(center = (pos))
         self.hitbox_rect = self.rect.inflate(-50,-30)
 
-        self.speed = 250
-        self.callback = callback
+        if self.level == 1:
+            self.scared_timer = Timer(1000)
+            self.viewbox_rect = self.image.get_frect(center = (pos)).inflate(500,500)
+            self.speed = 250
 
+        elif self.level == 2:
+            self.scared_timer = Timer(1200)
+            self.viewbox_rect = self.image.get_frect(center=(pos)).inflate(600, 600)
+            self.speed = 300
+        elif self.level == 3:
+            self.scared_timer = Timer(1400)
+            self.viewbox_rect = self.image.get_frect(center=(pos)).inflate(700, 700)
+            self.speed = 400
+
+
+
+
+        #self.speed = 0
+
+        self.callback = callback
 
     def __del__(self):
         pass
     def get_direction(self):
         npc_pos = pygame.Vector2(self.hitbox_rect.center)
         player_pos = pygame.Vector2(self.player.rect.center) - (0, 5)
-        if self.alive:
+        self.viewbox_rect.center = self.rect.center
+        if self.alive and self.ufo_in_view:
             self.direction = (npc_pos - player_pos).normalize()
-        else:
-            if (player_pos.x - npc_pos.x) != 0:
-                self.direction = (player_pos - npc_pos).normalize()
+        elif (player_pos.x - npc_pos.x) != 0 and not self.scared_timer.active:
+            self.direction = Vector2(0,0)
+        elif not self.alive:
+            self.direction = (player_pos - npc_pos).normalize()
         #print(round(self.direction.x),round(self.direction.y))
 
     def collision(self, direction):
@@ -61,13 +83,14 @@ class Npc(pygame.sprite.Sprite):
             self.collision('vertical')
             self.rect.center = self.hitbox_rect.center
         else:
+            #abduction
             self.hitbox_rect.x += self.direction.x * self.speed * dt * 2
             self.hitbox_rect.y += self.direction.y * self.speed * dt * 2
             self.rect.center = self.hitbox_rect.center
 
     def animate(self, dt):
         #get state
-        if floor(self.direction.x) == 0 and floor(self.direction.y) == 0:
+        if self.direction.x == 0 and self.direction.y == 0:
             self.state = 'idle'
         if round(self.direction.x) != 0:
             self.state = 'right' if round(self.direction.x) > 0 else 'left'
@@ -89,7 +112,7 @@ class Npc(pygame.sprite.Sprite):
             self.image = (self.frames[self.state][int(self.frame_index) % len(self.frames[self.state])]).convert_alpha()
         else:
             self.image = pygame.transform.scale_by(self.image,(0.9999,0.9999))
-            #print(self.abduction_timer.ticks)
+
 
             if not self.abduction_timer.active:
                 self.kill()
@@ -97,7 +120,7 @@ class Npc(pygame.sprite.Sprite):
 
 
             #self.image = (self.frames[self.state][int(self.frame_index) % len(self.frames[self.state])])
-        #self.image = pygame.Surface(self.hitbox_rect.size).convert_alpha()
+        #self.image = pygame.Surface(self.viewbox_rect.size).convert_alpha()
 
     def abduction(self,player_shadow):
         self.abduction_zone = self.hitbox_rect.scale_by(2,0.6)
@@ -111,12 +134,18 @@ class Npc(pygame.sprite.Sprite):
                 self.callback(1000)
             self.abduction_timer.activate()
 
-
+    def state_set(self):
+        self.ufo_in_view = self.viewbox_rect.collidepoint(self.player.rect.center)
+        if self.ufo_in_view:
+            self.scared_timer.activate()
 
     def update(self, dt):
-        self.abduction_timer.update()
 
+        self.state_set()
+        self.scared_timer.update()
+        self.abduction_timer.update()
         self.get_direction()
         self.abduction(self.player_shadow)
         self.animate(dt)
         self.move(dt)
+        print(self.scared_timer.active)
