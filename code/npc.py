@@ -127,7 +127,6 @@ class Npc(pygame.sprite.Sprite):
         playerOnTop = self.abduction_zone.collidepoint(player_shadow.hitbox_rect.centerx, player_shadow.hitbox_rect.centery - 25)
 
         if playerOnTop and self.abduction_state.toggle:
-
             self.alive = False
             if self.callback is not None:
                 # reward per npc
