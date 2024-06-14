@@ -23,6 +23,9 @@ class Game:
         self.paused = True
         self.menu_state = "main"
 
+        self.start_time = pygame.time.get_ticks()
+        self.elapsed_time = 0
+
         #UI
         self.font = pygame.font.SysFont('arialblack', 40)
         self.TEXT_COL = (255, 255, 255)
@@ -39,6 +42,7 @@ class Game:
         #Buttons
         BI = 130
 
+        self.button_play = Button(WINDOW_WIDTH / 2, 200, self.font, "Play", self.TEXT_COL)
         self.button_resume = Button(WINDOW_WIDTH / 2, 200, self.font, "Resume", self.TEXT_COL)
         self.button_intructions = Button(WINDOW_WIDTH / 2, self.button_resume.y + BI, self.font, "Instructions", self.TEXT_COL)
         self.button_exit = Button(WINDOW_WIDTH / 2, self.button_intructions.y + BI, self.font, "Exit", self.TEXT_COL)
@@ -115,13 +119,13 @@ class Game:
 
     def run(self):
         while self.running:
-
             # dt
             self.dt = (self.clock.tick() / 1000)
+
             if self.paused:
                 self.dt = 0
             else:
-                pass
+                self.elapsed_time += self.dt
             # eventloop
             for event in pygame.event.get():
                 if event.type == pygame.KEYDOWN:
@@ -140,7 +144,7 @@ class Game:
 
             #playerDead
             if self.current_health == 0:
-                self.player.out_of_energy()
+                self.player.out_of_energy(self.dt)
                 self.menu_state = "GameOver"
 
             # update
@@ -149,13 +153,18 @@ class Game:
 
             # draw
             self.all_sprites.draw(self.player.rect.center,self.dt)
-            print(self.clock.get_fps())
 
+            #print(self.clock.get_fps())
             # menu
             if self.paused == True:
+
                 if self.menu_state == "main":
-                    if self.button_resume.draw(self.display_surface):
-                        self.paused = False
+                    if self.elapsed_time == 0:
+                        if self.button_play.draw(self.display_surface):
+                            self.paused = False
+                    else:
+                        if self.button_resume.draw(self.display_surface):
+                            self.paused = False
                     if self.button_intructions.draw(self.display_surface):
                         self.menu_state = "instructions"
                     if self.button_exit.draw(self.display_surface):

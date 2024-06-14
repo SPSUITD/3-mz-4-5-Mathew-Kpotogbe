@@ -5,7 +5,7 @@ from math import floor, ceil
 
 def load_images(unit):
     frames = {'idle': [], 'left': [], 'right': [], 'up': [], 'down': [], 'down_left': [], 'down_right': [],
-                   'up_left': [], 'up_right': []}
+                   'up_left': [], 'up_right': [], 'fall':[]}
 
     for state in frames.keys():
         for folder_path, sub_folders, file_names in walk(join('..', 'images', unit, state)):

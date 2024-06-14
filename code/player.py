@@ -13,6 +13,7 @@ class Player(pygame.sprite.Sprite):
         self.groups = groups
         self.frames = frames
         self.state, self.frame_index = 'idle', 0
+        self.fall_animation_index = 0
         self.alive = True
 
 
@@ -128,23 +129,48 @@ class Player(pygame.sprite.Sprite):
             self.state = 'down_left'
 
 
+
+
         #animation
-        self.frame_index += dt * 60
-        self.image = self.frames[self.state][int(self.frame_index) % len(self.frames[self.state])]
+
+
+
+
+        if self.alive == True:
+            #normal animation
+            self.frame_index += dt * 60
+            self.image = self.frames[self.state][int(self.frame_index) % len(self.frames[self.state])]
+        else:
+            self.state = 'fall'
+            if self.fall_animation_index < 59:
+                self.fall_animation_index += dt * 60
+                self.image = self.frames[self.state][int(self.fall_animation_index)]
+            else:
+                #lastframe
+                self.image = self.frames[self.state][59]
+                pass
+
+
+
+
+
         #self.image = pygame.Surface(self.real_pos_rect.size).convert_alpha()
 
-    def out_of_energy(self):
+    def out_of_energy(self, dt):
         self.alive = False
         self.direction = pygame.Vector2(0,0)
         self.abduction.toggle = False
         #self.laser.toggle = False
-        self.state = 'idle'
+
+        #fallAnimation
+
+
     def update(self, dt):
 
+        self.animate(dt)
         self.shoot(dt)
         self.input(dt)
         self.move(dt)
-        self.animate(dt)
 
 
 
