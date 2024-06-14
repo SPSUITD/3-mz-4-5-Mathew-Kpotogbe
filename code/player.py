@@ -13,6 +13,7 @@ class Player(pygame.sprite.Sprite):
         self.groups = groups
         self.frames = frames
         self.state, self.frame_index = 'idle', 0
+        self.alive = True
 
 
         self.image = pygame.image.load(join('..','images','player', 'down', '0001.png')).convert_alpha()
@@ -25,7 +26,7 @@ class Player(pygame.sprite.Sprite):
         #self.rect = self.rect.inflate(-100,-100)
 
         #joined items
-        self.laser = Laser(self,False, self.groups)
+        #self.laser = Laser(self,False, self.groups)
         self.abduction = Abduction(self,False,self.groups)
         #self.shadow = Shadow(self, self.groups)
 
@@ -50,7 +51,7 @@ class Player(pygame.sprite.Sprite):
     #                     surf = pygame.image.load(full_path).convert_alpha()
     #                     self.frames[state].append(surf)
     def input(self, dt):
-        if dt !=0:
+        if dt !=0 and self.alive:
             keys = pygame.key.get_pressed()
             input_left = keys[pygame.K_LEFT] or keys[pygame.K_a]
             input_right = keys[pygame.K_RIGHT] or keys[pygame.K_d]
@@ -95,16 +96,17 @@ class Player(pygame.sprite.Sprite):
                     if self.direction.y > 0: self.hitbox_rect.bottom = sprite.rect.top
                     if self.direction.y < 0: self.hitbox_rect.top = sprite.rect.bottom
     def shoot(self, dt):
-        if dt != 0:
+        if dt != 0 and self.alive:
             if pygame.mouse.get_pressed()[0] == 1:
-                self.laser.toggle = True
+                #self.laser.toggle = True
                 self.abduction.toggle = False
             else:
-                self.laser.toggle = False
+                #self.laser.toggle = False
+                pass
 
             if pygame.mouse.get_pressed()[2] == 1:
                 self.abduction.toggle = True
-                self.laser.toggle = False
+                #self.laser.toggle = False
             else:
                 self.abduction.toggle = False
     def animate(self, dt):
@@ -131,6 +133,12 @@ class Player(pygame.sprite.Sprite):
         self.image = self.frames[self.state][int(self.frame_index) % len(self.frames[self.state])]
         #self.image = pygame.Surface(self.real_pos_rect.size).convert_alpha()
 
+    def out_of_energy(self):
+        self.alive = False
+        self.direction = pygame.Vector2(0,0)
+        self.abduction.toggle = False
+        #self.laser.toggle = False
+        self.state = 'idle'
     def update(self, dt):
 
         self.shoot(dt)

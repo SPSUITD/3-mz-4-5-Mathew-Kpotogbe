@@ -13,7 +13,7 @@ class AllSprites(pygame.sprite.Group):
     def draw(self, target_pos, dt):
         if dt != 0:
             heading = target_pos - self.camera
-            self.camera += heading * 0.01
+            self.camera += heading * 0.02
             self.offset = -self.camera + Vector2(WINDOW_WIDTH/2, WINDOW_HEIGHT/2)
 
 

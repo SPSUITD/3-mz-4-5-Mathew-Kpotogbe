@@ -3,8 +3,10 @@ from pygame import Surface
 from timer import Timer
 from settings import *
 from math import floor, ceil
+
+
 class Npc(pygame.sprite.Sprite):
-    def __init__(self, pos,frames, player, player_shadow,abduction_state, groups, collision_sprites):
+    def __init__(self, pos,frames, player, player_shadow,abduction_state, groups, collision_sprites, callback = None):
         super().__init__(groups)
         #impoerted values
         self.player_shadow = player_shadow
@@ -25,8 +27,11 @@ class Npc(pygame.sprite.Sprite):
         self.hitbox_rect = self.rect.inflate(-50,-30)
 
         self.speed = 250
+        self.callback = callback
 
 
+    def __del__(self):
+        pass
     def get_direction(self):
         npc_pos = pygame.Vector2(self.hitbox_rect.center)
         player_pos = pygame.Vector2(self.player.rect.center) - (0, 5)
@@ -85,8 +90,10 @@ class Npc(pygame.sprite.Sprite):
         else:
             self.image = pygame.transform.scale_by(self.image,(0.9999,0.9999))
             #print(self.abduction_timer.ticks)
+
             if not self.abduction_timer.active:
                 self.kill()
+
 
 
             #self.image = (self.frames[self.state][int(self.frame_index) % len(self.frames[self.state])])
@@ -97,8 +104,13 @@ class Npc(pygame.sprite.Sprite):
         playerOnTop = self.abduction_zone.collidepoint(player_shadow.hitbox_rect.centerx, player_shadow.hitbox_rect.centery - 25)
 
         if playerOnTop and self.abduction_state.toggle:
+
             self.alive = False
+            if self.callback is not None:
+                # reward per npc
+                self.callback(1000)
             self.abduction_timer.activate()
+
 
 
     def update(self, dt):
