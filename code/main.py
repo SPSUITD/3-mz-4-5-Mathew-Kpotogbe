@@ -77,7 +77,7 @@ class Game:
         if self.current_health <= 0:
             self.current_health = 0
     def health_add(self, reward):
-        self.score += (reward)//100
+        self.score += int((reward)/100)
         if self.current_health < self.maximum_health:
             self.current_health += reward
         if self.current_health >= self.maximum_health:
